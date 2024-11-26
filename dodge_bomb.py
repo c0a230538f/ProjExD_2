@@ -13,6 +13,18 @@ DELTA = {
 }
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
+def checkbound(rct: pg.Rect) -> tuple[bool, bool]:
+    """
+    引数で与えられたRectが画面の中か外かを判定する
+    引数:こうかとんRect or 爆弾Rect
+    戻り値:真理値タプル（横, 縦）/画面内True, 画面外False
+    """
+    yoko, tate = True, True
+    if rct.left < 0 or WIDTH < rct.right:
+        yoko = False
+    elif rct.top < 0 or HEIGHT < rct.bottom: #rct.topはこうかとんの頭、bottomは足
+        tate = False
+    return yoko, tate
 
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
@@ -41,10 +53,17 @@ def main():
             if key_lst[key]:
                 sum_mv[0] += tpl[0]
                 sum_mv[1] += tpl[1]
-
         kk_rct.move_ip(sum_mv)
+        #こうかとんが画面外なら、元の場所に戻す
+        if checkbound(kk_rct) != (True, True):
+            kk_rct.move_ip(-sum_mv[0], -sum_mv[1])
         screen.blit(kk_img, kk_rct)
         bb_rct.move_ip(vx, vy)
+        yoko, tate = checkbound(bb_rct)
+        if not yoko:
+            vx *= -1
+        if not tate:
+            vy *= -1
         screen.blit(bb_img, bb_rct)
         pg.display.update()
         tmr += 1
