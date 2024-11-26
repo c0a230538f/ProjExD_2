@@ -1,6 +1,7 @@
 import os
 import random
 import sys
+import time
 import pygame as pg
 
 
@@ -12,6 +13,25 @@ DELTA = {
     pg.K_RIGHT: (5, 0)
 }
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
+
+def gameover(screen: pg.Surface) -> None:
+    """
+    半透明の黒い画面上に「Game Over」と表示
+    引数:screen
+    戻り値:なし
+    """
+    blackbg = pg.Surface((WIDTH, HEIGHT)) #黒背景のSurface
+    pg.draw.rect(blackbg, (0, 0, 0) ,(0, 0, WIDTH, HEIGHT)) #黒背景の描画
+    pg.Surface.set_alpha(blackbg, 200) #背景の透明化
+    screen.blit(blackbg, (0, 0)) #黒背景の表示
+    fonto = pg.font.Font(None, 80) #フォントの設定
+    txt = fonto.render("Game Over", True, (255, 255, 255)) #ゲームオーバーの文字
+    screen.blit(txt, [400, 300]) #ゲームオーバーの表示
+    kk_img = pg.transform.rotozoom(pg.image.load("fig/8.png"), 0, 0.9) #こうかとんの画像
+    screen.blit(kk_img, [350, 300]) #左側にこうかとんの表示
+    screen.blit(kk_img, [720, 300]) #右側にこうかとんの表示
+    pg.display.update() #画面の更新
+    time.sleep(5) #5秒待つ
 
 def checkbound(rct: pg.Rect) -> tuple[bool, bool]:
     """
@@ -46,7 +66,7 @@ def main():
             if event.type == pg.QUIT: 
                 return
         if kk_rct.colliderect(bb_rct):
-            print("ゲームオーバー")
+            gameover(screen)
             return #ゲームオーバー
         screen.blit(bg_img, [0, 0]) 
 
